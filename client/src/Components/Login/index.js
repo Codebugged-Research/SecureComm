@@ -19,6 +19,7 @@ import {
 import { 
     GoogleLogin
 } from 'react-google-login';
+import axios from 'axios';
 
 function Login(){
 
@@ -27,13 +28,32 @@ function Login(){
     const handleSignIn = (e) => {
         e.preventDefault();
 
-        // axios request trigger point.
+        axios.post(`${process.env.REACT_APP_AUTH}/login`,{
+            email: e.target[0].value,
+            password: e.target[1].value
+        })
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
     }
 
     const handleSignUp = (e) => {
         e.preventDefault();
 
-        //axios request trigger point.
+        axios.post(`${process.env.REACT_APP_AUTH}/signUp`,{
+            email: e.target[0].value,
+            password: e.target[0].value,
+            cnf_password: e.target[2].value 
+        })
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
     }
 
     const toggleDisplay = () => {
