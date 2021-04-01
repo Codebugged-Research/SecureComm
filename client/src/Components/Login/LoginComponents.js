@@ -38,8 +38,6 @@ export const AuthComponent = styled.div`
     align-items: center;
     justify-content: center;
     position: relative;
-
-    transition: all 1s ease-in-out;
 `
 
 export const Heading = styled.div`
@@ -49,10 +47,18 @@ export const Heading = styled.div`
     font-size: 40px;
 `
 
+export const Description = styled.div`
+    font-family: Nunito, sans-serif;
+    font-family: 24px;
+    color: white;
+    text-align: center;
+    line-height: 1.6em;
+`
+
 export const FormContainer = styled.div`
     margin-top: 15px;
     width: 100%;
-    padding: 10px 25px;
+    padding: 0px 25px;
 `
 
 export const Button = styled.button`
@@ -73,6 +79,7 @@ export const Button = styled.button`
     font-size: 18px;
     border: none;
     justify-content: center;
+    outline: none;
     
     &:hover{
         cursor: pointer;
@@ -89,9 +96,9 @@ export const TextPara = styled.div`
     margin: 30px 0px 30px 0px;
 `
 
-export const ButtonShort = styled.div`
+export const ButtonShort = styled.button`
     padding: 20px 30px;
-    width: 20%;
+    width: 15%;
     text-align: center;
     margin: 0px auto;
     border-radius: 50px;
@@ -99,6 +106,14 @@ export const ButtonShort = styled.div`
     box-shadow: -3px 3px #D5D5D5;
     padding: 5px;
     background-color:  white;
+    outline: none;
+    border: none;
+
+    &:hover{
+        cursor: pointer;
+        box-shadow: 2px 4px #888888;
+        transition: all 0.7s ease;
+    }
 `
 
 export const Footer = styled.div`

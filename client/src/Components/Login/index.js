@@ -5,6 +5,7 @@ import {
     DetailComponent,
     AuthComponent,
     Heading,
+    Description,
     FormContainer,
     Button,
     TextPara,
@@ -48,7 +49,12 @@ function Login(){
             <Holder>
                 <DetailComponent>
                     <Heading style={{color: "white"}}>Secure Communication</Heading>
-
+                    <Description>This project is aimed at providing a secure communication and file sharing mechanism to avoid any theft of information and mantaining user privacy.</Description>
+                    <Description>
+                        Made By - Vasu Pandey | Sajal Gupta | Yash Goel<br/>
+                        B.tech CSE specialization in cyber security and forensics - 3rd Year<br/>
+                        Mentor - Amandeep saini
+                    </Description>
                 </DetailComponent>
                 <AuthComponent style={{display: disInd ? "flex" : "none"}}>
                     <Heading>Sign In</Heading>
@@ -83,7 +89,7 @@ function Login(){
                         clientId="15093828558-7g0ev4kaseu5qhfnsro3bpmi32jifs4r.apps.googleusercontent.com"
                         render={renderProps => (
                             <ButtonShort onClick={renderProps.onClick} disabled={renderProps.disabled}>
-                                <FaGooglePlusG />
+                                <FaGooglePlusG style={{width: "100%"}}/>
                             </ButtonShort>
                         )}
                         onSuccess={responseGoogle}
@@ -134,10 +140,17 @@ function Login(){
                         </form>
                     </FormContainer>
                     <TextPara style={{margin: "20px 0px"}}>or Sign up using</TextPara>
-                    <ButtonShort>
-                        {/* google icon and then style */}
-                    </ButtonShort>
-
+                    <GoogleLogin
+                        clientId="15093828558-7g0ev4kaseu5qhfnsro3bpmi32jifs4r.apps.googleusercontent.com"
+                        render={renderProps => (
+                            <ButtonShort onClick={renderProps.onClick} disabled={renderProps.disabled}>
+                                <FaGooglePlusG style={{width: "100%"}}/>
+                            </ButtonShort>
+                        )}
+                        onSuccess={responseGoogle}
+                        onFailure={responseGoogle}
+                        cookiePolicy={'single_host_origin'}
+                    />
                     <Footer>
                         <TextPara style={{margin: "0px"}}>Already A Member? <span style={{color: "#0575e6", cursor: "pointer"}} onClick={toggleDisplay}>Sign In</span></TextPara>
                     </Footer>
