@@ -20,10 +20,13 @@ import {
     GoogleLogin
 } from 'react-google-login';
 import axios from 'axios';
+import { authenticate } from '../../helpers/auth.helpers';
+import { useToast } from '@chakra-ui/react';
 
 function Login(){
 
     const [disInd, setDisInd] = useState(true);
+    const toast = useToast();
 
     const handleSignIn = (e) => {
         e.preventDefault();
@@ -33,10 +36,36 @@ function Login(){
             password: e.target[1].value
         })
         .then((res) => {
-            console.log(res);
+            if(res.data.response === 1){
+                authenticate(res);
+                toast({
+                    title: "Login Succesfull",
+                    description: "Redirecting to Chat console...",
+                    status: "success",
+                    duration: 3000,
+                    position: "top",
+                    isClosable: true
+                })
+            }else{
+                toast({
+                    title: "Error",
+                    description: "Invalid Email or Password",
+                    duration: 3000,
+                    position: "top",
+                    status: "error",
+                    isClosable: true
+                })
+            }
         })
         .catch((err) => {
-            console.log(err);
+            toast({
+                title: "Error",
+                description: "Please try again after some time.",
+                status: "error",
+                isClosable: true,
+                duration: 3000,
+                position: "top"
+            })
         })
     }
 
@@ -44,15 +73,41 @@ function Login(){
         e.preventDefault();
 
         axios.post(`${process.env.REACT_APP_AUTH}/signUp`,{
-            email: e.target[0].value,
-            password: e.target[0].value,
-            cnf_password: e.target[2].value 
+            name: e.target[0].value,
+            email: e.target[1].value,
+            password: e.target[2].value, 
         })
         .then((res) => {
-            console.log(res);
+            if(res.data.response === 1){
+                authenticate(res);
+                toast({
+                    title: "Signup successfull",
+                    description: "Redirecting to Chat console...",
+                    status: "success",
+                    isClosable: true,
+                    duration: 3000,
+                    position: "top"
+                })
+            } else {
+                toast({
+                    title: "Error",
+                    description: "User with this email already exists",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top",
+                    status: "error"
+                })
+            }
         })
         .catch((err) => {
-            console.log(err);
+            toast({
+                title: "Error",
+                description: "Please try again after some time.",
+                status: "error",
+                isClosable: true,
+                duration: 3000,
+                position: "top"
+            })
         })
     }
 
@@ -128,6 +183,16 @@ function Login(){
                             <TextField
                                 fullWidth
                                 required
+                                name="name"
+                                placeholder="Your Name"
+                                label="Name"
+                                type="text"
+                                autoComplete="off"
+                                style={{marginBottom: "20px"}}
+                            />
+                            <TextField
+                                fullWidth
+                                required
                                 name="email"
                                 placeholder="Your E-mail"
                                 label="Email"
@@ -141,16 +206,6 @@ function Login(){
                                 name="password"
                                 placeholder="Your Password"
                                 label="Password"
-                                type="password"
-                                autoComplete="off"
-                                style={{marginBottom: "20px"}}
-                            />
-                            <TextField
-                                fullWidth
-                                required
-                                name="cnf_password"
-                                placeholder="Confirm Password"
-                                label="Confirm Password"
                                 type="password"
                                 autoComplete="off"
                             />

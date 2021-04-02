@@ -119,7 +119,7 @@ export const ButtonShort = styled.button`
 export const Footer = styled.div`
     position: absolute;
     bottom: 0;
-    padding: 10px;
+    padding: 5px;
     border-top: 2px solid #888888;
     width: 65%;
 `
