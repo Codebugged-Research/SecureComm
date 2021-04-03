@@ -7,13 +7,21 @@ const connectDB = require('./config/db');
 const express = require('express');
 const cors = require('cors');
 const socket = require('socket.io');
+const http = require('http');
 
 const authRouter = require('./routes/authRouter.js');
+const fileRouter = require('./routes/fileRouter.js');
 
 connectDB();
 
 const app = express();
-const io = socket(app);
+
+const server = http.createServer(app);
+const io = socket(server,{
+    cors: {
+        origin: "http://localhost:3000"
+    }
+});
 
 app.use(express.json());
 app.use(cors({
@@ -21,6 +29,7 @@ app.use(cors({
 }))
 
 app.use('/auth', authRouter);
+app.use('/file', fileRouter);
 
 let participants = [];
 
@@ -30,20 +39,19 @@ io.on('connection', socket => {
             username,
             id: socket.id
         }
+        
         participants.push(user)
         io.emit("newUser", participants);
     })
 
-    socket.on("joinedRoom", (roomName, cb) => {
-        socket.join(roomName);
-        cb(messages[roomName]);
-    })
-
-    socket.on("sendMessage", ({message, to, sender}) => {
+    socket.on("sendMessage", ({message, to, type, name, fileName, sender}) => {
         const payload = {
             message,
             chatName: sender,
-            sender
+            sender,
+            type,
+            name,
+            fileName
         }
         socket.to(to).emit("newMessage", payload);
     })
@@ -53,7 +61,6 @@ io.on('connection', socket => {
         io.emit("newUser", participants)
     })
 })
-
-app.listen(3001, (req, res, next) => {
+server.listen(3001, (req, res, next) => {
     console.log("Server listening on port assigned");
 })
