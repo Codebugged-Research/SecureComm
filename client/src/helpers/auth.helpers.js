@@ -23,12 +23,21 @@ export const signout = () => {
 }
 
 export const isAuth = (token) => {
+
+    let state = "";
+
     if(token){
-        jwt.decode(token, process.env.REACT_APP_JWT, (err, decode) => {
-            if(err || !decode){
-                return false
+        jwt.verify(token, process.env.REACT_APP_JWT, function(err, decode){
+            if(err){
+                state = false;
             }
-            return true
+            state = true
         })
+    }
+
+    if(state === true){
+        return true
+    } else {
+        return false
     }
 }

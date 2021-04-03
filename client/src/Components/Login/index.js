@@ -9,21 +9,14 @@ import {
     FormContainer,
     Button,
     TextPara,
-    ButtonShort,
     Footer
 } from './LoginComponents';
 import TextField from '@material-ui/core/TextField';
-import {
-    FaGooglePlusG
-} from 'react-icons/fa';
-import { 
-    GoogleLogin
-} from 'react-google-login';
 import axios from 'axios';
 import { authenticate } from '../../helpers/auth.helpers';
 import { useToast } from '@chakra-ui/react';
 
-function Login(){
+function Login({history}){
 
     const [disInd, setDisInd] = useState(true);
     const toast = useToast();
@@ -38,6 +31,10 @@ function Login(){
         .then((res) => {
             if(res.data.response === 1){
                 authenticate(res);
+                setTimeout(() => {
+                    history.push('/chatConsole');
+                }, 750);
+
                 toast({
                     title: "Login Succesfull",
                     description: "Redirecting to Chat console...",
@@ -80,6 +77,9 @@ function Login(){
         .then((res) => {
             if(res.data.response === 1){
                 authenticate(res);
+                setTimeout(() => {
+                    history.push('/chatConsole');
+                }, 750);
                 toast({
                     title: "Signup successfull",
                     description: "Redirecting to Chat console...",
@@ -113,10 +113,6 @@ function Login(){
 
     const toggleDisplay = () => {
         setDisInd(!disInd);
-    }
-
-    const responseGoogle = (response) => {
-        console.log(response);
     }
 
     return(
@@ -159,19 +155,6 @@ function Login(){
                             </Button>
                         </form>
                     </FormContainer>
-                    <TextPara>or Sign in with</TextPara>
-                    <GoogleLogin
-                        clientId="15093828558-7g0ev4kaseu5qhfnsro3bpmi32jifs4r.apps.googleusercontent.com"
-                        render={renderProps => (
-                            <ButtonShort onClick={renderProps.onClick} disabled={renderProps.disabled}>
-                                <FaGooglePlusG style={{width: "100%"}}/>
-                            </ButtonShort>
-                        )}
-                        onSuccess={responseGoogle}
-                        onFailure={responseGoogle}
-                        cookiePolicy={'single_host_origin'}
-                    />
-
                     <Footer>
                         <TextPara style={{margin: "0px"}}>Not A Member? <span style={{color: "#0575e6", cursor: "pointer"}} onClick={toggleDisplay}>Sign Up</span></TextPara>
                     </Footer>
@@ -214,18 +197,6 @@ function Login(){
                             </Button>
                         </form>
                     </FormContainer>
-                    <TextPara style={{margin: "20px 0px"}}>or Sign up using</TextPara>
-                    <GoogleLogin
-                        clientId="15093828558-7g0ev4kaseu5qhfnsro3bpmi32jifs4r.apps.googleusercontent.com"
-                        render={renderProps => (
-                            <ButtonShort onClick={renderProps.onClick} disabled={renderProps.disabled}>
-                                <FaGooglePlusG style={{width: "100%"}}/>
-                            </ButtonShort>
-                        )}
-                        onSuccess={responseGoogle}
-                        onFailure={responseGoogle}
-                        cookiePolicy={'single_host_origin'}
-                    />
                     <Footer>
                         <TextPara style={{margin: "0px"}}>Already A Member? <span style={{color: "#0575e6", cursor: "pointer"}} onClick={toggleDisplay}>Sign In</span></TextPara>
                     </Footer>

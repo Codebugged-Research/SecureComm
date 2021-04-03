@@ -63,7 +63,7 @@ export const FormContainer = styled.div`
 
 export const Button = styled.button`
     display: flex;
-    margin-top: 25px;
+    margin-top: 35px;
     width: 75%;
     text-align: center;
     border-radius: 50px;

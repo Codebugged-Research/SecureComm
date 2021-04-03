@@ -68,7 +68,7 @@ exports.loginController = (req, res) => {
                     response : 0
                 })
             } else {
-                const { _id, name, email } = user;
+                const { _id, name, email } = user[0];
     
                 const token = jwt.sign({
                     _id,
@@ -80,7 +80,7 @@ exports.loginController = (req, res) => {
     
                 return res.status(200).json({
                     response: 1,
-                    name: user.name,
+                    name: user[0].name,
                     token: token
                 })
             }
