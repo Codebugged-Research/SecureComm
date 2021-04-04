@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Section = styled.div`
-    max-width: 1300px;
+    width: 100%;
     height: 100vh;
 `
 
@@ -52,22 +52,29 @@ export const Participants = styled.div`
 
 export const Element = styled.div`
     width: 100%;
-    padding: 5px;
+    padding: 20px 10px;
     text-align: center;
     font-size: 18px;
     font-family: Nunito;
     cursor: pointer;
+    transition: all 0.5s ease;
+
+    &:hover{
+        background-color: #d1d0cd;
+    }
 `
 
 export const ChatSection = styled.div`
     position: relative;
+    height: 100%;
 `
 
 export const Message = styled.div`
     width: 100%;
-    padding: 15px;
+    padding: 15px 15px 0px 15px;
     background-color: transparent;
     overflow: scroll;
+    height: 87%;
 `
 
 export const MessagePanel = styled.div`
@@ -83,6 +90,7 @@ export const Writer = styled.div`
     width: 100%;
     bottom: 0;
     right:0;
+    height: 13%;
     padding: 15px 10px 15px 10px;
     background-color: #0000FF;
     border-top-left-radius: 7px;

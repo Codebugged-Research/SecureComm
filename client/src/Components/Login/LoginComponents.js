@@ -4,10 +4,9 @@ export const Section = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 1300px;
-    height: 100%;
+    height: 100vh;
+    width: 100%;
     padding: 50px;
-    // background-color: #a4ebf3;
 `
 
 export const Holder = styled.div`

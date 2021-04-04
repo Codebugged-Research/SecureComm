@@ -24,7 +24,6 @@ import {
     AiOutlineSend
 } from 'react-icons/ai';
 import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -37,7 +36,7 @@ import {
     Progress,
     Center,
     Button,
-    toast
+    useToast
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -47,9 +46,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 function ChatConsole({history}) {
 
-    const initialMessagesState = {
-    }
-
+    const initialMessagesState = {}
+    const toastId = "test-toast";
+    const [fileOriginal, setFileOriginal] = useState('');
     const [formData, setFormData] = useState('')
     const [progressPercent, setProgressPercent] = useState(0)
     const [error, setError] = useState({
@@ -60,7 +59,29 @@ function ChatConsole({history}) {
     const upload = ({target: {files}}) => {
         let data = new FormData()
         data.append('fileSend', files[0])
+        setFileOriginal(files[0].name);
         setFormData(data)
+    }
+
+    const handleOpen = () => {
+        if(currentChat.chatName !== ""){
+            setOpen(true);
+        } else {
+            if(!toast.isActive(toastId)){
+                toast({
+                    id: toastId,
+                    description: "Select A Person To Send The File To",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top",
+                    status: "error"
+                })
+            }
+        }
+    }
+
+    const handleClose = () => {
+        setOpen(false);
     }
 
     const onSubmitFile = (e) => {
@@ -76,15 +97,15 @@ function ChatConsole({history}) {
         axios.post(`${process.env.REACT_APP_SEND_FILE}/uploadFile`, formData, options)
         .then((res) => {
             setTimeout(() => {
-                setProgressPercent(0)
-                setOpen(false);
+                setProgressPercent(0);
+                handleClose();
             }, 1000)
-            toast.success("File Sent Successfully!")
+            sendFileMessage(`I have sent a file ${fileOriginal}`, fileOriginal, res.data.sendFile);
         })
         .catch(err => {
             setError({
                 found: true,
-                message:err.response.data.err
+                message: err.response.data.err
             })
             setTimeout(() => {
                 setError({
@@ -96,6 +117,7 @@ function ChatConsole({history}) {
         })
     }
 
+    const toast = useToast();
     const [open, setOpen] = useState(false);
     const [username, setUsername] = useState(localStorage.getItem("user"));
     const [connected, setConnected] = useState(true);
@@ -107,6 +129,47 @@ function ChatConsole({history}) {
 
     function handleMessageChange(e){
         setMessage(e.target.value);
+    }
+
+    function handleKeyDown(e){
+        if(e.keyCode === 13){
+            sendMessage();
+        }
+    }
+
+    function activeChat() {
+        var childrenElem = [...document.getElementById("joined").children]
+
+        childrenElem.forEach((elem) => {
+            if(elem.id === currentChat.receiverId){
+                document.getElementById(`${elem.id}`).style.backgroundColor = "#d1d0cd";
+            } else {
+                document.getElementById(`${elem.id}`).style.backgroundColor = "white";
+            }
+        })
+    }
+
+    function sendFileMessage(message, fileOriginal, fileName) {
+        if(message !== "" && currentChat.chatName !== ""){
+            const payloadFile = {
+                message: message,
+                type:"file",
+                name: fileOriginal,
+                fileName: fileName,
+                to: currentChat.receiverId,
+                sender: username,
+                chatName: currentChat.chatName
+            }
+
+            socketRef.current.emit("sendMessage", payloadFile);
+            const newMessage = immer(messages, draft => {
+                draft[currentChat.chatName].push({
+                    sender: "You",
+                    message: message
+                })
+            })
+            setMessages(newMessage);
+        }
     }
 
     function sendMessage(){
@@ -126,6 +189,7 @@ function ChatConsole({history}) {
                 })
             })
             setMessages(newMessages);
+            setMessage("");
         }
     }
 
@@ -136,6 +200,7 @@ function ChatConsole({history}) {
             });
             setMessages(newMessages);
         }
+        activeChat();
         setCurrentChat(currentChat);
     }
 
@@ -147,52 +212,79 @@ function ChatConsole({history}) {
     function renderUsers(user) {
         if(user.id === socketRef.current.id){
         } else {
-            const currentChat = {
+            const currentChatc = {
                 chatName: user.username,
                 receiverId: user.id
             }
 
             return (
-                <Element onClick={() => {toggleChat(currentChat)}} key={user.id}>
+                <Element id={`${user.id}`} style={currentChat.chatName !== "" ?  currentChat.receiverId === user.id ? {backgroundColor: "#d1d0cd"} : null : null} onClick={() => {toggleChat(currentChatc)}} key={user.id}>
                     {user.username}
                 </Element>
             )
         }
     }
 
+    function downloadFile(original, fileName) {
+        axios({
+            method: "POST",
+            url: `${process.env.REACT_APP_SEND_FILE}/getFile`,
+            responseType: "blob",
+            headers: {},
+            data:{
+                original: original,
+                fileName: fileName
+            },
+        })
+        .then((res) => {
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `${original}`);
+            document.body.appendChild(link);
+            link.click();
+            window.URL.revokeObjectURL(url);
+            })
+        .catch((err) => {
+            toast({
+                title: "File Download Failed",
+                position: "bottom",
+                duration: 3000,
+                isClosable: true,
+                status: "error"
+            })
+        })
+    }
+
     function renderMessages(message, index) {
         return(
-            <MessagePanel key={index}>
-                <h3>{message.sender}</h3>
-                <p>{message.message}</p>
+            <MessagePanel key={index} style={message.sender === "You" ? {textAlign: "end"} : {textAlign: "start"}} onClick={message.type ? () => {downloadFile(message.name, message.fileName)} : null} >
+                <h3 style={{fontSize: "18px"}}>{message.sender}</h3>
+                <p style={message.type ? {cursor: "pointer"} : null}>{message.message}</p>
             </MessagePanel>
         )
     }
 
     useEffect(() => {
-        socketRef.current = io.connect("http://localhost:3001");
+        socketRef.current = io.connect("https://securecomm.tk:443");
 
         socketRef.current.on("newUser", alluser => {
             setAllUsers(alluser);
         })
         socketRef.current.emit("joinedChat", username);
-        socketRef.current.on("newMessage", ({message, sender, chatName}) => {
+        socketRef.current.on("newMessage", ({message, sender, chatName, type, name, fileName}) => {
             setMessages(messages => {
                 const newMessages = immer(messages, draft => {
                     if(draft[chatName]){
-                        draft[chatName].push({message, sender});
+                        draft[chatName].push({message, type, name, fileName, sender});
                     } else {
-                        draft[chatName] = [{message, sender}];
+                        draft[chatName] = [{message, type, name, fileName, sender}];
                     }
                 })
                 return newMessages;
             })
         })
     },[connected, username])
-
-    useEffect(() => {
-        setMessage("");
-    }, [messages])
 
     return (
         <Section>
@@ -219,12 +311,13 @@ function ChatConsole({history}) {
                             }
                         </Message>
                         <Writer>
-                            <ButtonAS onClick={() => {setOpen(true)}}>Attach File</ButtonAS>
+                            <ButtonAS onClick={handleOpen}>Attach File</ButtonAS>
                             <Input
                                 value={message}
                                 onChange={handleMessageChange}
                                 variant="outlined"
                                 style={{backgroundColor:"white", borderRadius: "5px", padding: "5px"}}
+                                onKeyDown={handleKeyDown}
                             />
                             <ButtonAS><AiOutlineSend style={{fontSize: "20px"}} onClick={sendMessage}/></ButtonAS>
                         </Writer>
@@ -250,8 +343,8 @@ function ChatConsole({history}) {
                         <Stack spacing={5} pt={4}>
                         <Progress value={progressPercent} colorScheme="purple">{progressPercent}</Progress>
                             <FormControl>
-                                <FormLabel>Profile Picture</FormLabel>
-                                <I type='file'name='profilePic' placeholder="Choose an image" variant="flushed" focusBorderColor="purple.400" onChange={upload}/>
+                                <FormLabel>File To Be Sent</FormLabel>
+                                <I type='file'name='profilePic' placeholder="Choose an file" variant="flushed" focusBorderColor="purple.400" onChange={upload}/>
                             </FormControl>
                             <Center>
                                 <Button type="submit" style={{backgroundColor: "#0000FF"}} color="white" w={["100%", "75%"]}>Upload</Button>

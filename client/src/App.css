@@ -1,3 +1,7 @@
 ::-webkit-scrollbar{
   width: 1px;
 }
+
+.activeChat{
+  background-color: #d1d0cd;
+}
