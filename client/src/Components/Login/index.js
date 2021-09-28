@@ -124,7 +124,7 @@ function Login({history}){
                     <Description>
                         Made By - Vasu Pandey | Sajal Gupta | Yash Goel<br/>
                         B.tech CSE specialization in cyber security and forensics - 3rd Year<br/>
-                        Mentor - Amandeep saini
+                        Mentor - Paramjeeti Singh
                     </Description>
                 </DetailComponent>
                 <AuthComponent style={{display: disInd ? "flex" : "none"}}>
